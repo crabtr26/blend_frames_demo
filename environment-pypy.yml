@@ -1,0 +1,8 @@
+name: blend-frames-pypy
+
+dependencies:
+  - python=3.8
+  - pypy
+  - maturin=0.13.2
+  - numpy=1.23.2
+  - Pillow=9.2.0

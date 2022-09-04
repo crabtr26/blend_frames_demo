@@ -1,0 +1,16 @@
+[package]
+name = "rust-ext"
+version = "0.1.0"
+authors = ["Jacob Crabtree <crabtr26@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "rust_ext"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.17", features = ["extension-module", "abi3-py37"] }
+numpy = "0.17"
+bounded-vec-deque = "0.1.1"
+
+[workspace]
