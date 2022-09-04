@@ -56,6 +56,13 @@ def blend_frame_algorithm(frames: deque):
 def benchmark_numpy_average():
     np.average(frames, axis=0).astype(np.uint8)
 
+@timeit
+def benchmark_numpy_average_loop():
+    total_frame = np.empty_like(frames[0])
+    for frame in frames:
+        total_frame += frame
+    blended_frame = (total_frame / frames.shape[0]).astype(np.uint8)
+
 
 @timeit
 def benchmark_blend_frame_algorithm():
@@ -180,6 +187,7 @@ if __name__ == "__main__":
     benchmark_numpy_average()
     benchmark_blend_frame_algorithm()
     benchmark_rust_average()
+    benchmark_numpy_average_loop()
 
     print("\n")
 
