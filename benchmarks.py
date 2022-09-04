@@ -9,7 +9,6 @@ from PIL import Image
 
 import rust_ext
 
-MAX_ITERS = 1_000
 
 filepaths = [
     os.path.join(os.getcwd(), "frames", f)
@@ -21,6 +20,10 @@ frames = np.array([np.asarray(im) for im in images])
 frames_dq = deque(maxlen=10)
 for frame in frames:
     frames_dq.append(frame)
+
+MAX_ITERS = 1_000
+MAX_DEQUE_LEN = 10
+N_FRAMES = len(frames)
 
 
 def timeit(f):
@@ -68,41 +71,43 @@ def numpy_blend_frames():
     blend_frames_q = np.empty([10, 1080, 1920, 3], dtype=np.uint8)
     input_frame_idx = 0
     for _ in range(MAX_ITERS):
-        frame = frames[input_frame_idx % 10]
+        frame = frames[input_frame_idx % N_FRAMES]
         if frame is None:
             break
         input_frame_idx += 1
-        blend_frames_q = np.append(blend_frames_q[1:10], [frame], axis=0)
-        if input_frame_idx % 10 == 0:
+        blend_frames_q = np.append(
+            blend_frames_q[1 : MAX_DEQUE_LEN - 1], [frame], axis=0
+        )
+        if input_frame_idx % MAX_DEQUE_LEN == 0:
             blended_frame = np.average(blend_frames_q, axis=0).astype(np.uint8)
 
 
 @timeit
 def deque_blend_frames():
-    blend_frames_q = deque(maxlen=10)
+    blend_frames_q = deque(maxlen=MAX_DEQUE_LEN)
     input_frame_idx = 0
     for _ in range(MAX_ITERS):
-        frame = frames[input_frame_idx % 10]
+        frame = frames[input_frame_idx % N_FRAMES]
         if frame is None:
             break
         input_frame_idx += 1
         blend_frames_q.append(frame)
-        if input_frame_idx % 10 == 0:
+        if input_frame_idx % MAX_DEQUE_LEN == 0:
             blended_frame = blend_frame_algorithm(blend_frames_q)
 
 
 @timeit
 def deque_blend_frames_multithreading():
-    blend_frames_q = deque(maxlen=10)
+    blend_frames_q = deque(maxlen=MAX_DEQUE_LEN)
     input_frame_idx = 0
     futures = []
     for _ in range(MAX_ITERS):
-        frame = frames[input_frame_idx % 10]
+        frame = frames[input_frame_idx % N_FRAMES]
         if frame is None:
             break
         input_frame_idx += 1
         blend_frames_q.append(frame)
-        if input_frame_idx % 10 == 0:
+        if input_frame_idx % MAX_DEQUE_LEN == 0:
             with ThreadPoolExecutor() as executor:
                 future = executor.submit(blend_frame_algorithm, blend_frames_q)
                 futures.append(future)
@@ -112,16 +117,16 @@ def deque_blend_frames_multithreading():
 
 @timeit
 def deque_blend_frames_multiprocessing():
-    blend_frames_q = deque(maxlen=10)
+    blend_frames_q = deque(maxlen=MAX_DEQUE_LEN)
     input_frame_idx = 0
     futures = []
     for _ in range(MAX_ITERS):
-        frame = frames[input_frame_idx % 10]
+        frame = frames[input_frame_idx % N_FRAMES]
         if frame is None:
             break
         input_frame_idx += 1
         blend_frames_q.append(frame)
-        if input_frame_idx % 10 == 0:
+        if input_frame_idx % MAX_DEQUE_LEN == 0:
             with ProcessPoolExecutor() as executor:
                 future = executor.submit(blend_frame_algorithm, blend_frames_q)
                 futures.append(future)
@@ -131,7 +136,7 @@ def deque_blend_frames_multiprocessing():
 
 @timeit
 def deque_blend_frames_rust():
-    rust_ext.blend_frames(frames, MAX_ITERS)
+    rust_ext.blend_frames(frames, MAX_ITERS, MAX_DEQUE_LEN)
 
 
 if __name__ == "__main__":
