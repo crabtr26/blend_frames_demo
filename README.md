@@ -4,18 +4,7 @@ A simple rust extension for blending together image frames from a bounded queue.
 
 ## Setup
 
-### CPython with pip & virtualenv
-
-```bash
-virtualenv .venv && \
-source .venv/bin/activate && \
-pip install -r requirements.txt && \
-cd rust_ext && \
-maturin develop --release && \
-cd -
-```
-
-### CPython with conda
+### CPython
 
 ```bash
 conda env create -f environment.yml && \
@@ -25,7 +14,7 @@ maturin develop --release && \
 cd -
 ```
 
-### PyPy with conda
+### PyPy
 
 ```bash
 conda env create -f environment-pypy.yml && \
@@ -61,6 +50,14 @@ print(rust_ext.blend_frames(frames, MAX_ITERS))
 
 ### Benchmark the performance of the rust extension
 
+#### CPython
+
 ```bash
 python benchmarks.py
+```
+
+#### PyPy
+
+```bash
+python benchmarks-pypy.py
 ```
