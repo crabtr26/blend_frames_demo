@@ -47,6 +47,7 @@ from PIL import Image
 import rust_ext
 
 MAX_ITERS = 1_000
+MAX_DEQUE_LEN = 10
 filepaths = [
     os.path.join(os.getcwd(), "frames", f)
     for f in os.listdir("frames")
@@ -56,7 +57,7 @@ images = [Image.open(fpath) for fpath in filepaths]
 frames = np.array([np.asarray(im) for im in images])
 
 print(rust_ext.average(frames))
-print(rust_ext.blend_frames(frames, MAX_ITERS))
+print(rust_ext.blend_frames(frames, MAX_ITERS, MAX_DEQUE_LEN))
 ```
 
 ### Benchmark the performance of the rust extension
