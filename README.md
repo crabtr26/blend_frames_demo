@@ -49,15 +49,15 @@ print(rust_ext.average(frames))
 print(rust_ext.blend_frames(frames, MAX_ITERS, MAX_DEQUE_LEN))
 ```
 
-### Benchmark the performance of the rust extension
+## Benchmark the performance of the rust extension
 
-#### CPython
+### CPython
 
 ```bash
 python benchmarks.py
 ```
 
-#### PyPy
+### PyPy
 
 ```bash
 python benchmarks-pypy.py
